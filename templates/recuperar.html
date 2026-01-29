@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Contraseña - Barbero_1999</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.8)), 
+                        url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+
+        .login-card { 
+            background-color: rgba(42, 42, 42, 0.9); 
+            padding: 40px; 
+            border-radius: 15px; 
+            border: 1px solid #d4af37; 
+            text-align: center; 
+            width: 320px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+            backdrop-filter: blur(8px);
+        }
+
+        h2 { margin-bottom: 15px; color: #d4af37; text-transform: uppercase; letter-spacing: 2px; }
+        
+        p { font-size: 0.9em; opacity: 0.8; margin-bottom: 25px; line-height: 1.5; }
+
+        input { 
+            display: block; 
+            width: 100%; 
+            margin: 15px 0; 
+            padding: 12px; 
+            border-radius: 8px; 
+            border: 1px solid #444; 
+            background-color: rgba(26, 26, 26, 0.8); 
+            color: white; 
+            box-sizing: border-box; 
+        }
+        input:focus { border-color: #d4af37; outline: none; background-color: #1a1a1a; }
+        
+        .btn { 
+            background-color: #d4af37; 
+            color: black; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: bold; 
+            font-size: 1em; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+        }
+        .btn:hover { background-color: #b8962e; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+
+        .alert { padding: 10px; margin-bottom: 20px; border-radius: 5px; font-size: 0.85em; text-align: left; }
+        .alert-error { border: 1px solid white; color: white; background: rgba(26, 26, 26, 0.8); }
+        .alert-exito { border: 1px solid #d4af37; color: #d4af37; background: rgba(26, 26, 26, 0.8); }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 0.85em;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+        .back-link:hover { opacity: 1; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Recuperar</h2>
+        <p>Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/recuperar_password" method="POST">
+            <input type="email" name="email" placeholder="Correo electrónico" required>
+            <button type="submit" class="btn">Enviar enlace</button>
+        </form>
+        
+        <a href="/login" class="back-link">Volver al inicio de sesión</a>
+    </div>
+</body>
+</html>

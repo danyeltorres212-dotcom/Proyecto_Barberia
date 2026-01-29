@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Barbero_1999</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(rgba(10, 10, 10, 0.8), rgba(10, 10, 10, 0.8)), 
+                        url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+
+        .register-card { 
+            background-color: rgba(42, 42, 42, 0.9); 
+            padding: 40px; 
+            border-radius: 15px; 
+            border: 1px solid #d4af37; 
+            text-align: center; 
+            width: 320px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+            backdrop-filter: blur(8px);
+        }
+
+        h2 { margin-bottom: 25px; color: #d4af37; text-transform: uppercase; letter-spacing: 2px; }
+        
+        input { 
+            display: block; 
+            width: 100%; 
+            margin: 15px 0; 
+            padding: 12px; 
+            border-radius: 8px; 
+            border: 1px solid #444; 
+            background-color: rgba(26, 26, 26, 0.8); 
+            color: white; 
+            box-sizing: border-box; 
+        }
+        input:focus { border-color: #d4af37; outline: none; background-color: #1a1a1a; }
+        
+        .btn { 
+            background-color: #d4af37; 
+            color: black; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: bold; 
+            font-size: 1em; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        .btn:hover { background-color: #b8962e; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+
+        .alert { padding: 12px; margin-bottom: 20px; border-radius: 5px; font-size: 0.85em; text-align: center; line-height: 1.4; }
+        .alert-error { border: 1px solid #ff4d4d; color: #ff4d4d; background: rgba(255, 77, 77, 0.1); }
+        .alert-exito { border: 1px solid #d4af37; color: #d4af37; background: rgba(212, 175, 55, 0.1); }
+
+        .register-card a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 0.85em;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+        .register-card a:hover { opacity: 1; text-decoration: underline; }
+
+        .info-text { font-size: 0.75em; opacity: 0.6; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <h2>Crear Cuenta</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/registro" method="POST">
+            <input type="text" name="nombre" placeholder="Tu Nombre" required>
+            <input type="email" name="email" placeholder="Tu Correo" required>
+            <input type="password" name="password" placeholder="Contraseña segura" minlength="8" required>
+            <p class="info-text">Te enviaremos un correo de confirmación.</p>
+            <button type="submit" class="btn">REGISTRARME</button>
+        </form>
+        
+        <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+    </div>
+</body>
+</html>

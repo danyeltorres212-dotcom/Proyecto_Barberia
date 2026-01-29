@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Barbero - El Barbero 1999</title>
+    <style>
+        :root { 
+            --gold: #d4af37; 
+            --dark: #0a0a0a; 
+            --sidebar-bg: #111111;
+            --card: #161616; 
+            --border: #222; 
+            --text: #ffffff; 
+            --danger: #e74c3c; 
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--dark); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+        }
+
+        /* SIDEBAR */
+        .sidebar { 
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            height: 100vh; 
+            padding: 30px 20px; 
+            border-right: 1px solid var(--gold); 
+            position: fixed; 
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box; 
+            z-index: 100; 
+        }
+
+        .brand-container { text-align: center; margin-bottom: 30px; }
+        .logo-placeholder { width: 60px; margin: 0 auto 15px; display: block; filter: sepia(1) saturate(5) hue-rotate(10deg); }
+        
+        .sidebar h2 { 
+            color: var(--gold); 
+            margin: 0; 
+            font-family: 'Georgia', serif; 
+            font-size: 1.3rem; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .barber-name { 
+            color: #eee; 
+            font-size: 0.85em; 
+            margin: 10px 0 25px; 
+            font-weight: 300;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-menu { flex-grow: 1; }
+        .nav-btn { 
+            width: 100%; 
+            padding: 14px 15px; 
+            margin-bottom: 12px; 
+            background: none; 
+            border: 1px solid var(--border); 
+            color: white; 
+            text-align: center; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            transition: 0.4s; 
+            display: block; 
+            text-decoration: none; 
+            box-sizing: border-box; 
+            font-size: 12px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .nav-btn:hover, .nav-btn.active { 
+            background: var(--gold); 
+            color: black; 
+            font-weight: bold; 
+            border-color: var(--gold);
+        }
+
+        .btn-logout { 
+            border: 1px solid #333; 
+            color: #888; 
+            padding: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: auto; 
+        }
+        .btn-logout:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* CONTENIDO PRINCIPAL */
+        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; }
+
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { 
+            background: var(--card); 
+            padding: 25px; 
+            border-radius: 4px; 
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--gold);
+            text-align: center; 
+        }
+        .stat-card h3 { margin: 0; font-size: 0.8em; color: #777; text-transform: uppercase; letter-spacing: 2px; }
+        .stat-card p { margin: 15px 0 0; font-size: 2.5em; font-family: 'Georgia', serif; color: var(--gold); font-weight: bold; }
+
+        .card { background: var(--card); padding: 30px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 25px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--gold); padding: 15px 10px; font-weight: 400; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 20px 10px; border-bottom: 1px solid #222; font-size: 1em; color: white; }
+
+        .btn-small { 
+            padding: 10px 18px; 
+            border-radius: 4px; 
+            font-size: 0.8em; 
+            cursor: pointer; 
+            border: 1px solid var(--gold); 
+            font-weight: bold; 
+            text-decoration: none; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            transition: 0.3s;
+            background: transparent;
+            color: var(--gold);
+        }
+        .btn-add { background: var(--gold); color: black; }
+        .btn-confirm { background: transparent; color: white; border-color: white; }
+        .btn-confirm:hover { background: white; color: black; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; border: 1px solid var(--gold); color: var(--gold); }
+
+        /* Inputs de Fecha y Hora con iconos claros */
+        input[type="date"], input[type="time"], input[type="text"] {
+            width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 4px; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--gold); outline: none; }
+        input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+        .notification-toast {
+            position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 4px; font-size: 0.9em; z-index: 2000;
+            background-color: var(--card); border: 1px solid var(--gold); color: var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            animation: slideIn 0.5s ease-out;
+        }
+        /* --- MEJORAS PARA EL FORMULARIO DE BLOQUEOS --- */
+
+/* Contenedor de cada campo */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+}
+
+/* Estilo refinado para inputs de línea inferior (Underlined) */
+.input-underlined {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid #333 !important;
+    border-radius: 0 !important;
+    padding: 10px 0 !important;
+    transition: border-color 0.4s ease;
+}
+
+.input-underlined:focus {
+    border-bottom-color: var(--gold) !important;
+}
+
+/* Estilo para el área de texto (Motivo) */
+.textarea-minimal {
+    width: 100%;
+    background: #0c0c0c;
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 12px; /* Reducido un poco */
+    margin-top: 10px;
+    border-radius: 4px;
+    resize: none;
+    font-family: inherit;
+    transition: 0.3s;
+    /* Añade estas dos líneas para controlar el tamaño */
+    height: 100px; 
+    box-sizing: border-box;
+}
+
+.textarea-minimal:focus {
+    border-color: var(--gold);
+    outline: none;
+}
+
+/* Estilo para el checkbox dorado */
+.checkbox-custom {
+    width: 18px; 
+    height: 18px; 
+    accent-color: var(--gold); 
+    cursor: pointer;
+}
+
+/* Enlace de eliminación tipo texto */
+.btn-delete-link {
+    background: none; 
+    border: none; 
+    color: var(--danger); 
+    cursor: pointer; 
+    text-transform: uppercase; 
+    font-size: 0.7em; 
+    letter-spacing: 1px;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.btn-delete-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); margin: 5% auto; padding: 40px; width: 550px; border-radius: 4px; border: 1px solid var(--gold); box-sizing: border-box; }
+        .modal-content h3 { color: var(--gold); font-family: 'Georgia', serif; letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; }
+        
+        select { background: #000; color: white; border: 1px solid #333; padding: 12px; border-radius: 4px; font-size: 1em; outline: none; }
+        select:focus { border-color: var(--gold); }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="notification-toast" id="auto-close-alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="sidebar">
+    <div class="brand-container">
+        <img src="/static/img/logo.png" alt="Logo" class="logo-placeholder">
+        <h2>El Barbero 1999</h2>
+        <p class="barber-name">{{ empleado.nombre }}</p>
+    </div>
+    
+    <div class="nav-menu">
+        <button class="nav-btn" id="btn-hoy" onclick="showSection('hoy', event)">Mi Agenda</button>
+        <button class="nav-btn" id="btn-reportes" onclick="showSection('reportes', event)">Mis Ganancias</button>
+        <button class="nav-btn" id="btn-disponibilidad" onclick="showSection('disponibilidad', event)">Gestionar Disponibilidad</button>
+    </div>
+    
+    <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+</div>
+
+<div class="main-content">
+    
+    <div id="hoy" class="section">
+        <div class="grid-stats">
+            <div class="stat-card"><h3>Pendientes</h3><p>{{ pendientes }}</p></div>
+            <div class="stat-card"><h3>Completados</h3><p>{{ completados }}</p></div>
+            <div class="stat-card"><h3>Total Turnos</h3><p>{{ total_hoy }}</p></div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; letter-spacing: 2px; text-transform: uppercase; font-size: 1.1rem; color: var(--gold);">Próximos Clientes</h3>
+                <span style="color: #666; font-size: 0.9em;">{{ hoy_str }}</span>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px;">
+                {% for dia in dias_semana %}
+                <a href="?fecha={{ dia.fecha }}" 
+                    style="text-decoration: none; display: flex; flex-direction: column; align-items: center; min-width: 55px; padding: 12px 8px; border-radius: 12px; border: 1px solid {{ 'var(--gold)' if dia.fecha == fecha_actual else '#2d2d2d' }}; background: {{ 'linear-gradient(145deg, #2a2a2a, #1a1a1a)' if dia.fecha == fecha_actual else 'transparent' }}; transition: 0.3s;">
+                    <span style="font-size: 0.65rem; color: {{ 'var(--gold)' if dia.fecha == fecha_actual else '#666' }}; text-transform: uppercase; margin-bottom: 4px;">{{ dia.nombre }}</span>
+                    <span style="font-size: 1.1rem; color: {{ '#fff' if dia.fecha == fecha_actual else '#aaa' }}; font-weight: bold;">{{ dia.numero }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th style="text-align: right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in turnos %}
+                    <tr>
+                        <td width="10%"><strong>{{ t.fecha_hora.strftime('%H:%M') }}</strong></td>
+                        <td>{{ t.cliente.nombre if t.cliente else t.nombre_cliente }}</td>
+                        <td style="color: #aaa;">{{ t.servicio.nombre }}</td>
+                        <td><span class="badge">{{ t.estado }}</span></td>
+                        <td style="color: var(--gold); font-weight: bold;">
+                            ${{ "%.2f"|format(t.total_pagado if t.total_pagado else t.servicio.precio) }}
+                        </td>
+                        <td style="text-align: right;">
+                            {% if t.estado == 'pendiente' %}
+                                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                    <button class="btn-small btn-add" data-id="{{ t.id }}" onclick="openAdicionales(this)">+ Extra</button>
+                                    <form action="/completar-turno/{{ t.id }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn-small btn-confirm" onclick="return confirm('¿Confirmar finalización?')">Finalizar</button>
+                                    </form>
+                                    <form action="/empleado/inasistencia/{{ t.id }}" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn-small" style="border-color: #444; color: #888;">🚫</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <button class="btn-small btn-confirm" data-id="{{ t.id }}" onclick="openDetalles(this)">Ver Detalles</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" style="text-align: center; color: #555; padding: 30px;">No hay citas para esta fecha.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="reportes" class="section">
+        <div class="grid-stats">
+            <div class="stat-card"><h3>Estimado Mes</h3><p style="color: var(--gold);">${{ "%.2f"|format(mensual_estimado) }}</p></div>
+            <div class="stat-card"><h3>Servicios</h3><p style="color: var(--gold);">{{ servicios_totales }}</p></div>
+            <div class="stat-card"><h3>Comisión</h3><p style="color: var(--gold);">{{ porcentaje_aplicado }}%</p></div>
+        </div>
+
+        {% if historial_semanal %}
+            {% for semana, datos in historial_semanal.items() %}
+            <div class="card" style="border-top: 1px solid var(--gold); margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 15px;">
+                    <h3 style="color: var(--gold); margin:0;">SEMANA {{ semana }}</h3>
+                    <span style="font-size: 1.4em; color: white; font-weight: bold;">${{ "%.2f"|format(datos.comision_total) }}</span>
+                </div>
+                <table style="margin-top: 15px;">
+                    <tbody>
+                        {% for dia_nombre, contenido in datos.detalles_dias.items() %}
+                            {% for cita in contenido.servicios_lista %}
+                            <tr>
+                                <td style="color: #666;"><strong>{{ dia_nombre }}</strong> | {{ cita.hora }}</td>
+                                <td>{{ cita.servicios }}</td>
+                                <td style="text-align: right; color: var(--gold); font-weight: bold;">${{ "%.2f"|format(cita.ganancia) }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card" style="text-align:center; padding:40px; color:#555;">No hay historial de ganancias disponible.</div>
+        {% endif %}
+    </div>
+
+    <div id="disponibilidad" class="section">
+        <div class="card" style="border: 1px solid var(--gold); background: linear-gradient(145deg, #111, #050505); padding: 30px;">
+            <h3 style="color: var(--gold); text-align: center; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 25px;">
+                Gestión de Ausencias
+            </h3>
+            
+            <form action="/empleado/bloquear-disponibilidad" method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="input-group">
+                        <label style="color: var(--gold); display: block; margin-bottom: 8px; font-size: 0.8em; text-transform: uppercase;">Fecha del Bloqueo</label>
+                        <input type="date" name="fecha_bloqueo" required 
+                               style="width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; outline: none;">
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 15px; padding: 10px 0;">
+                        <input type="checkbox" id="dia_completo" name="dia_completo" onchange="toggleHoras(this)" 
+                               style="width: 20px; height: 20px; accent-color: var(--gold); cursor: pointer;">
+                        <label for="dia_completo" style="color: #eee; cursor: pointer; font-size: 0.9em; text-transform: uppercase;">Jornada Completa</label>
+                    </div>
+
+                    <div id="rango_horas" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label style="color: #666; font-size: 0.7em; text-transform: uppercase;">Desde</label>
+                            <input type="time" name="hora_inicio" class="input-hora" style="width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px;">
+                        </div>
+                        <div>
+                            <label style="color: #666; font-size: 0.7em; text-transform: uppercase;">Hasta</label>
+                            <input type="time" name="hora_fin" class="input-hora" style="width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="input-group">
+                        <label style="color: var(--gold); display: block; margin-bottom: 8px; font-size: 0.8em; text-transform: uppercase;">Motivo o Novedad</label>
+                        <textarea name="motivo" placeholder="Ej: Cita médica..." rows="4" 
+                                  style="width: 100%; background: #1a1a1a; border: 1px solid #333; color: white; padding: 12px; border-radius: 5px; outline: none; resize: none; font-family: inherit;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-small btn-add" style="width: 100%; padding: 15px; margin-top: auto; font-weight: bold; letter-spacing: 2px; border: 1px solid var(--gold);">
+                        REGISTRAR BLOQUEO
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 25px; border-top: 1px solid #333;">
+            <h4 style="color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Bloqueos Activos</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Horario</th>
+                        <th>Motivo</th>
+                        <th style="text-align: right;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bloqueo in bloqueos_activos %}
+                    <tr>
+                        <td>{{ bloqueo.fecha }}</td>
+                        <td>
+                            {% if bloqueo.dia_completo %}
+                                <span style="color: var(--gold);">Día Completo</span>
+                            {% else %}
+                                {{ bloqueo.hora_inicio }} - {{ bloqueo.hora_fin }}
+                            {% endif %}
+                        </td>
+                        <td style="color: #aaa; font-style: italic;">{{ bloqueo.motivo }}</td>
+                        <td style="text-align: right;">
+                            <form action="/empleado/eliminar-bloqueo/{{ bloqueo.id }}" method="POST" style="display: inline;">
+                                <button type="submit" style="background:none; border:none; color:#ff4444; cursor:pointer; font-size: 1.2rem;" onclick="return confirm('¿Eliminar este bloqueo?')">✕</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" style="text-align: center; color: #555; padding: 20px;">No tienes ausencias programadas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalAdicionales" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000;">
+    <div class="modal-content" style="background:#111; margin: 10% auto; padding:20px; width:50%; border:1px solid var(--gold);">
+        <input type="hidden" id="modal_turno_id">
+        <h3 id="titulo_modal" style="color:var(--gold);">Extras</h3>
+        
+        <div id="controles_registro" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <select id="extra_tipo" onchange="cargarOpciones()" style="background:#000; color:#fff; border:1px solid #333;">
+                <option value="servicio">Servicio Extra</option>
+                <option value="producto">Producto</option>
+            </select>
+            <select id="extra_item" style="flex:2; background:#000; color:#fff; border:1px solid #333;"></select>
+            <button onclick="agregarALista()" class="btn-small btn-add">+</button>
+        </div>
+
+        <div style="max-height: 200px; overflow-y: auto; background:#000; padding:10px;">
+            <table style="width:100%"><tbody id="lista_extras_temp"></tbody></table>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top:20px;">
+            <button onclick="closeModal()" class="btn-small">Cerrar</button>
+            <button id="btn_guardar_extras" onclick="enviarExtrasServidor()" class="btn-small btn-add">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- NAVEGACIÓN ---
+    function showSection(sectionId, event) {
+        console.log("Mostrando sección:", sectionId);
+        
+        // 1. Ocultar todas
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(s => {
+            s.style.display = 'none';
+            s.classList.remove('active');
+        });
+
+        // 2. Desactivar todos los botones
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+        // 3. Activar la elegida
+        const target = document.getElementById(sectionId);
+        if (target) {
+            target.style.display = 'block';
+            target.classList.add('active');
+            localStorage.setItem('empleado_tab_activa', sectionId);
+        }
+
+        // 4. Marcar botón activo
+        if (event) {
+            event.currentTarget.classList.add('active');
+        } else {
+            const btn = document.getElementById('btn-' + sectionId);
+            if (btn) btn.classList.add('active');
+        }
+    }
+
+    // --- DATOS ---
+    const productosBase = [
+        {% for p in productos %} { id: "{{p.id}}", nombre: "{{p.nombre|safe}}", precio: "{{p.precio}}" }, {% endfor %}
+    ];
+    const serviciosBase = [
+        {% for s in servicios_extra %} { id: "{{s.id}}", nombre: "{{s.nombre|safe}}", precio: "{{s.precio}}" }, {% endfor %}
+    ];
+    let extrasSeleccionados = [];
+
+    // --- FUNCIONES DE EXTRAS ---
+    function cargarOpciones() {
+        const tipo = document.getElementById('extra_tipo').value;
+        const select = document.getElementById('extra_item');
+        select.innerHTML = '';
+        const lista = (tipo === 'servicio') ? serviciosBase : productosBase;
+        lista.forEach(item => {
+            let opt = document.createElement('option');
+            opt.value = item.id;
+            opt.dataset.nombre = item.nombre;
+            opt.textContent = `${item.nombre} ($${item.precio})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function renderizarExtras() {
+        const tbody = document.getElementById('lista_extras_temp');
+        const editable = document.getElementById('controles_registro').style.display !== 'none';
+        
+        if (extrasSeleccionados.length === 0) {
+            tbody.innerHTML = '<tr><td style="color:#444; text-align:center;">Sin extras</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = extrasSeleccionados.map((item, index) => `
+            <tr>
+                <td style="color:white; padding:8px; border-bottom:1px solid #222;">
+                    <small style="color:var(--gold)">${item.tipo.toUpperCase()}</small> | ${item.nombre}
+                </td>
+                <td style="text-align:right;">
+                    ${editable ? `<button onclick="eliminarDeLista(${index})" style="color:red; background:none; border:none; cursor:pointer;">&times;</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function agregarALista() {
+        const tipo = document.getElementById('extra_tipo').value;
+        const select = document.getElementById('extra_item');
+        if (!select.value) return;
+        extrasSeleccionados.push({
+            id: select.value,
+            nombre: select.options[select.selectedIndex].dataset.nombre,
+            tipo: tipo
+        });
+        renderizarExtras();
+    }
+
+    function eliminarDeLista(index) {
+        extrasSeleccionados.splice(index, 1);
+        renderizarExtras();
+    }
+
+    function openAdicionales(button) {
+        const turnoId = button.getAttribute('data-id');
+        document.getElementById('modal_turno_id').value = turnoId;
+        document.getElementById('titulo_modal').textContent = "Gestionar Extras";
+        document.getElementById('controles_registro').style.display = 'flex';
+        document.getElementById('btn_guardar_extras').style.display = 'block';
+        fetchExtras(turnoId);
+        document.getElementById('modalAdicionales').style.display = 'block';
+        cargarOpciones();
+    }
+
+    function openDetalles(button) {
+        const turnoId = button.getAttribute('data-id');
+        document.getElementById('titulo_modal').textContent = "Detalles del Servicio";
+        document.getElementById('controles_registro').style.display = 'none';
+        document.getElementById('btn_guardar_extras').style.display = 'none';
+        fetchExtras(turnoId);
+        document.getElementById('modalAdicionales').style.display = 'block';
+    }
+
+    function fetchExtras(turnoId) {
+        fetch(`/get_extras_turno/${turnoId}`)
+            .then(res => res.json())
+            .then(data => {
+                extrasSeleccionados = data.extras || [];
+                renderizarExtras();
+            });
+    }
+
+    function enviarExtrasServidor() {
+        const turnoId = document.getElementById('modal_turno_id').value;
+        fetch('/guardar_extras_multiples', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ turno_id: turnoId, extras: extrasSeleccionados })
+        }).then(res => res.ok ? window.location.reload() : alert("Error al guardar"));
+    }
+
+    function closeModal() { document.getElementById('modalAdicionales').style.display = 'none'; }
+
+    function toggleHoras(checkbox) {
+        document.querySelectorAll('.input-hora').forEach(i => {
+            i.disabled = checkbox.checked;
+            i.style.opacity = checkbox.checked ? "0.3" : "1";
+        });
+    }
+
+    // --- AL CARGAR ---
+    document.addEventListener("DOMContentLoaded", function() {
+        const tab = localStorage.getItem('empleado_tab_activa') || 'hoy';
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Si hay un cambio de fecha en la URL, siempre mostrar 'hoy'
+        if (urlParams.has('fecha')) {
+            showSection('hoy');
+        } else {
+            showSection(tab);
+        }
+
+        // Auto-cierre de alertas
+        const toast = document.getElementById('auto-close-alert');
+        if (toast) {
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+    });
+</script>
+</body>
+</html>

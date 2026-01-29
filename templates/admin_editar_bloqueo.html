@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Bloqueo | Panel Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark: #0a0a0a;
+            --card-bg: #111;
+            --text-dim: #888;
+        }
+        body {
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .edit-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #222;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h2 { color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-size: 1.2em; margin-bottom: 30px; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: var(--gold); font-size: 0.8em; margin-bottom: 8px; text-transform: uppercase; }
+        input, textarea {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        input:focus { border-color: var(--gold); outline: none; }
+        .btn-save {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-save:hover { background: #b8962d; }
+        .cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="edit-container">
+    <h2>Editar Ausencia</h2>
+    <p style="text-align: center; color: var(--text-dim); font-size: 0.9em; margin-bottom: 25px;">
+        Barbero: <strong>{{ b.empleado.nombre }}</strong>
+    </p>
+
+    <form action="/admin/actualizar-bloqueo/{{ b.id }}" method="POST">
+        <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" name="fecha" value="{{ b.fecha }}" required>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin: 25px 0;">
+            <input type="checkbox" name="dia_completo" id="dc" 
+       style="width: auto; accent-color: var(--gold); cursor: pointer;" 
+       {% if b.dia_completo %}checked{% endif %} 
+       onchange="toggleTimeFields(this)">
+            <label for="dc" style="margin-bottom: 0; cursor: pointer;">Jornada Completa</label>
+        </div>
+
+        <div id="time-range" style="display: {% if b.dia_completo %}none{% else %}grid{% endif %}; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>Desde</label>
+                <input type="time" name="hora_inicio" value="{{ b.hora_inicio }}">
+            </div>
+            <div class="form-group">
+                <label>Hasta</label>
+                <input type="time" name="hora_fin" value="{{ b.hora_fin }}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Motivo</label>
+            <textarea name="motivo" rows="3">{{ b.motivo }}</textarea>
+        </div>
+
+        <button type="submit" class="btn-save">Guardar Cambios</button>
+        <a href="/admin/dashboard#usuarios" class="cancel-link">Volver sin cambios</a>
+    </form>
+</div>
+
+<script>
+    function toggleTimeFields(checkbox) {
+        const timeRange = document.getElementById('time-range');
+        timeRange.style.display = checkbox.checked ? 'none' : 'grid';
+    }
+</script>
+
+</body>
+</html>

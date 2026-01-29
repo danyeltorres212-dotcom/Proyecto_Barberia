@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administrativo - El Barbero 1999</title>
+    <style>
+        :root { 
+            --gold: #d4af37; 
+            --dark: #0a0a0a; 
+            --sidebar-bg: #111111;
+            --card: #161616; 
+            --border: #333333; 
+            --text: #ffffff; 
+            --text-dim: #888888;
+            --danger: #ff4444;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--dark); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+        }
+
+        /* SIDEBAR */
+        .sidebar { 
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            height: 100vh; 
+            padding: 30px 20px; 
+            border-right: 1px solid var(--gold); 
+            position: fixed; 
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box; 
+            z-index: 100; 
+        }
+
+        .brand-container { text-align: center; margin-bottom: 30px; }
+        .logo-placeholder { width: 60px; margin: 0 auto 15px; display: block; filter: grayscale(1) brightness(2); }
+        
+        .sidebar h2 { 
+            color: var(--gold); 
+            margin: 0; 
+            font-family: 'Georgia', serif; 
+            font-size: 1.1rem; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .admin-badge { 
+            color: var(--text); 
+            font-size: 0.7em; 
+            margin: 10px 0 25px; 
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 1px solid var(--gold);
+            padding: 5px 10px;
+            display: inline-block;
+        }
+
+        .nav-menu { flex-grow: 1; }
+        .nav-btn { 
+            width: 100%; 
+            padding: 14px 15px; 
+            margin-bottom: 12px; 
+            background: none; 
+            border: 1px solid var(--border); 
+            color: white; 
+            text-align: left; 
+            cursor: pointer; 
+            border-radius: 0; 
+            transition: 0.4s; 
+            display: block; 
+            text-decoration: none; 
+            box-sizing: border-box; 
+            font-size: 11px; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .nav-btn:hover, .nav-btn.active { 
+            background: var(--gold); 
+            color: black; 
+            font-weight: bold; 
+            border-color: var(--gold);
+        }
+
+        .btn-logout { 
+            border: 1px solid var(--border); 
+            color: var(--text-dim); 
+            padding: 12px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: auto; 
+        }
+        .btn-logout:hover { border-color: white; color: white; }
+
+        /* CONTENIDO PRINCIPAL */
+        .main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-family: 'Georgia', serif;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { 
+            background: var(--card); 
+            padding: 25px; 
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--gold);
+            text-align: center; 
+        }
+        .stat-card h3 { margin: 0; font-size: 0.75em; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; }
+        .stat-card p { margin: 15px 0 0; font-size: 2.2em; font-family: 'Georgia', serif; color: white; font-weight: bold; }
+
+        .card { background: var(--card); padding: 30px; border: 1px solid var(--border); margin-bottom: 25px; }
+        
+        /* TABLAS */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--gold); padding: 15px 10px; font-weight: 400; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 15px 10px; border-bottom: 1px solid var(--border); font-size: 0.95em; color: white; }
+
+        /* INPUTS Y BOTONES */
+        input, select, textarea {
+            width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); color: white; border-radius: 0; box-sizing: border-box; margin-bottom: 15px;
+        }
+        input:focus { border-color: var(--gold); outline: none; }
+
+        .btn-gold { 
+            background: var(--gold); color: black; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; 
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; width: 100%;
+        }
+        .btn-gold:hover { background: #f1f1f1; color: black; }
+
+        .btn-outline {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; 
+            cursor: pointer; text-transform: uppercase; font-size: 0.75em; letter-spacing: 1px; text-decoration: none; display: inline-block;
+        }
+        .btn-outline:hover { background: white; border-color: white; color: black; }
+
+        .btn-action-dim { 
+            color: white; border: 1px solid var(--border); background: transparent; padding: 5px 10px; 
+            text-decoration: none; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+        }
+        .btn-action-dim:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* UTILIDADES */
+        .badge-gold { border: 1px solid var(--gold); color: var(--gold); padding: 2px 8px; font-size: 0.75em; text-transform: uppercase; }
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .client-result-item { 
+            background: #000; padding: 20px; border: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; 
+        }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; top: 0; 
+            width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.8em; color: var(--gold); margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 10px; background: #111; border: 1px solid #333; color: white; border-radius: 4px; }
+
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="brand-container">
+        <img src="/static/img/logo.png" alt="Logo" class="logo-placeholder">
+        <h2>El Barbero 1999</h2>
+        <span class="admin-badge">Administrador</span>
+    </div>
+    
+    <div class="nav-menu">
+        <button class="nav-btn active" onclick="showSection('inicio')">Resumen Semanal</button>
+        <button class="nav-btn" onclick="showSection('datos')">Contabilidad</button>
+        <button class="nav-btn" onclick="showSection('usuarios')">Barberos</button>
+        <button class="nav-btn" onclick="showSection('inventario')">Servicios y Stock</button>
+        <button class="nav-btn" onclick="showSection('puntos')">Fidelización</button>
+    </div>
+    
+    <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+</div>
+
+<div class="main-content">
+
+    <div id="inicio" class="section active">
+        <div class="section-header">
+            <h2>Resumen Operativo</h2>
+            <span style="color: var(--text-dim);">{{ hoy_str }}</span>
+        </div>
+
+        <div class="grid-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
+            <div class="stat-card"><h3>Pendientes</h3><p>{{ programados_hoy }}</p></div>
+            <div class="stat-card"><h3>Completados Hoy</h3><p>{{ completados_hoy }}</p></div>
+            <div class="stat-card"><h3>Total Histórico</h3><p>{{ total_turnos_historico }}</p></div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--gold); font-family: 'Georgia', serif; text-transform: uppercase; margin-top: 0; letter-spacing: 2px;">Agenda del Día</h3>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch;">
+                {% for dia in dias_semana %}
+                <a href="?fecha={{ dia.fecha }}#inicio" 
+                   style="text-decoration: none; display: flex; flex-direction: column; align-items: center; min-width: 60px; flex-shrink: 0; padding: 10px; border-radius: 8px; border: 1px solid {{ 'var(--gold)' if dia.fecha == fecha_actual else '#333' }}; background: {{ 'rgba(212, 175, 55, 0.1)' if dia.fecha == fecha_actual else 'transparent' }};">
+                    <span style="font-size: 0.7em; color: #888; text-transform: uppercase;">{{ dia.nombre }}</span>
+                    <span style="font-size: 1.1em; color: {{ 'var(--gold)' if dia.fecha == fecha_actual else '#fff' }}; font-weight: bold;">{{ dia.numero }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            {% for empleado in empleados %}
+                <div style="margin-top: 30px;">
+                    <h4 style="color: white; border-left: 2px solid var(--gold); padding-left: 15px; text-transform: uppercase; letter-spacing: 2px; font-weight: 400; margin-bottom: 15px;">{{ empleado.nombre }}</h4>
+                    
+                    <div style="width: 100%; overflow-x: auto; border-radius: 8px;">
+                        <table style="width: 100%; min-width: 600px; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #333;">
+                                    <th>Hora</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th style="text-align: right;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for t in turnos_hoy if t.empleado_id == empleado.id %}
+                                <tr style="border-bottom: 1px solid #222;">
+                                    <td width="10%"><strong style="color: var(--gold);">{{ t.fecha_hora.strftime('%H:%M') }}</strong></td>
+                                    <td>{{ t.nombre_cliente }}</td>
+                                    <td style="color: var(--text-dim);">{{ t.servicio.nombre if t.servicio else 'N/A' }}</td>
+                                    <td><span class="badge-gold">{{ t.estado }}</span></td>
+                                    <td style="text-align: right;">
+                                        {% if t.estado == 'pendiente' %}
+                                            <form action="/cancelar-turno/{{ t.id }}" method="POST" style="display:inline;">
+                                                <button type="submit" class="btn-action-dim" onclick="return confirm('¿Seguro?')">Cancelar</button>
+                                            </form>
+                                        {% else %}
+                                            <span style="color: var(--text-dim); font-size: 0.8em;">Procesado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div> <div id="datos" class="section">
+        <div class="section-header"><h2>Contabilidad</h2></div>
+        
+        <div class="card">
+            <h3 style="color: white; margin-top: 0; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px;">Exportación de Datos</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                <a href="/admin/reporte/diario" class="btn-outline" style="text-align: center;">Diario</a>
+                <a href="/admin/reporte/semanal" class="btn-outline" style="text-align: center;">Semanal</a>
+                <a href="/admin/reporte/mensual" class="btn-outline" style="text-align: center;">Mensual</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--gold); margin-bottom: 20px;">
+                LIQUIDACIÓN DETALLADA - <span style="color: white;">{{ periodo }}</span>
+            </h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>BARBERO</th>
+                        <th>TOTAL RECAUDADO</th>
+                        <th>PAGO BARBERO</th>
+                        <th>GANANCIA LOCAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in liquidacion %}
+                    <tr>
+                        <td><strong>{{ item.nombre }}</strong></td>
+                        <td>${{ "{:,.0f}".format(item.total_recaudado) }}</td>
+                        <td style="color: var(--gold); font-weight: bold;">
+                            ${{ "{:,.0f}".format(item.pago_barbero) }}
+                        </td>
+                        <td>${{ "{:,.0f}".format(item.ganancia_local) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="usuarios" class="section">
+        <div class="section-header"><h2>Gestión de Personal</h2></div>
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px;">
+            <div class="card">
+                <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em;">Nuevo Registro</h3>
+                <form action="/admin/crear-empleado" method="POST">
+                    <input type="text" name="nombre" placeholder="Nombre Completo" required>
+                    <input type="email" name="email" placeholder="Email Institucional" required>
+                    <input type="password" name="password" placeholder="Contraseña" required>
+                    <input type="number" name="comision" placeholder="Comisión %" value="70">
+                    <input type="text" name="especialidad" placeholder="Especialidad (ej: Barbero Senior)" required>
+                    <select name="sucursal_id" required>
+                        {% for s in sucursales %}
+                            <option value="{{ s.id }}">{{ s.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn-gold">Guardar Barbero</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em;">Plantilla Activa</h3>
+                <table>
+                    <thead><tr><th>Nombre</th><th>Sede</th><th>Acción</th></tr></thead>
+                    <tbody>
+                        {% for e in empleados %}
+                        <tr>
+                            <td><strong>{{ e.nombre }}</strong></td>
+                            <td><span style="color: var(--text-dim);">{{ e.sucursal_local.nombre if e.sucursal_local else 'Principal' }}</span></td>
+                            <td><a href="/admin/eliminar-empleado/{{ e.id }}" class="btn-action-dim" onclick="return confirm('¿Confirmar baja?')">Eliminar</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    </div> <div class="card" style="margin-top: 25px; width: 100%; box-sizing: border-box;">
+    <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em; letter-spacing: 2px;">
+        Control de Ausencias y Bloqueos
+    </h3>
+    
+    <table style="width: 100%; margin-top: 20px;">
+        <thead>
+            <tr>
+                <th>Barbero</th>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Motivo</th>
+                <th style="text-align: right;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in todos_los_bloqueos %}
+            <tr>
+                <td><strong>{{ b.empleado.nombre }}</strong></td>
+                <td style="color: var(--gold);">{{ b.fecha }}</td>
+                <td>
+                    {% if b.dia_completo %}
+                        <span style="border: 1px solid var(--gold); color: var(--gold); padding: 2px 8px; font-size: 0.7em; text-transform: uppercase;">Jornada Completa</span>
+                    {% else %}
+                        {{ b.hora_inicio }} - {{ b.hora_fin }}
+                    {% endif %}
+                </td>
+                <td style="color: var(--text-dim); font-style: italic; font-size: 0.85em;">
+                    {{ b.motivo or 'Sin especificar' }}
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                    <a href="/admin/editar-bloqueo/{{ b.id }}" 
+                       style="color: var(--gold); text-decoration: none; margin-right: 15px; font-size: 0.8em; letter-spacing: 1px;">
+                       EDITAR
+                    </a>
+
+                    <form action="/admin/eliminar-bloqueo/{{ b.id }}" method="POST" style="display: inline;">
+                        <button type="submit" 
+                                style="background: none; border: none; color: white; cursor: pointer; font-family: Arial, sans-serif; font-size: 1.2em; vertical-align: middle;" 
+                                onclick="return confirm('¿Anular este bloqueo?')">✕</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+
+    <div id="inventario" class="section">
+    <div class="section-header"><h2>Servicios y Stock</h2></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+        
+        <div class="card">
+            <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em;">Catálogo de Servicios</h3>
+            <form action="/admin/add-servicio" method="POST" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px;">
+                <input type="text" name="nombre" placeholder="Servicio" required>
+                <input type="number" name="precio" placeholder="Precio $" required>
+                <input type="number" name="duracion" placeholder="Minutos" required>
+                <button type="submit" class="btn-gold" style="grid-column: span 3;">+ Añadir Servicio</button>
+            </form>
+            
+            <table style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Duración</th>
+                        <th>Precio</th>
+                        <th style="text-align: right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in servicios %}
+                    <tr>
+                        <td>{{ s.nombre }}</td>
+                        <td style="color: #888;">{{ s.duracion_minutos }} min</td>
+                        <td style="font-weight: bold; color: var(--gold);">${{ "{:,.0f}".format(s.precio) }}</td>
+                        <td style="text-align: right;">
+                            <button onclick="openEditServicio('{{ s.id }}', '{{ s.nombre }}', '{{ s.precio }}', '{{ s.duracion_minutos }}')" 
+                                    style="background:none; border:none; color:var(--gold); cursor:pointer; font-size: 1.1em;">✎</button>
+                            <a href="/admin/eliminar-servicio/{{ s.id }}" 
+                               style="color: white; text-decoration: none; margin-left: 10px;" 
+                               onclick="return confirm('¿Eliminar servicio?')">✕</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em;">Inventario de Productos</h3>
+            <form action="/admin/add-producto" method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" name="nombre" placeholder="Producto" required>
+                <input type="number" name="precio" placeholder="Precio" required>
+                <input type="number" name="stock" placeholder="Stock" required>
+                <input type="text" name="unidad" placeholder="Medida (ej: uds)" required> 
+                <button type="submit" class="btn-gold" style="grid-column: span 2;">+ Añadir Producto</button>
+            </form>
+
+            <table style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Precio</th>
+                        <th style="text-align: right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr>
+                        <td>{{ p.nombre }} <br><small style="color: #666;">{{ p.unidad }}</small></td>
+                        <td style="font-weight: bold; color: var(--gold);">{{ p.stock }}</td>
+                        <td>${{ "{:,.0f}".format(p.precio) }}</td>
+                        <td style="text-align: right;">
+                            <button onclick="openEditProducto('{{ p.id }}', '{{ p.nombre }}', '{{ p.precio }}', '{{ p.stock }}', '{{ p.unidad }}')" 
+                                    style="background:none; border:none; color:var(--gold); cursor:pointer; font-size: 1.1em;">✎</button>
+                            <a href="/admin/eliminar-producto/{{ p.id }}" 
+                               style="color: white; text-decoration: none; margin-left: 10px;" 
+                               onclick="return confirm('¿Eliminar producto?')">✕</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="puntos" class="section">
+    <div class="section-header"><h2>Sistema de Fidelización</h2></div>
+    
+    <div class="card" style="margin-bottom: 25px;">
+        <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px;">Gestión de Canje</h3>
+        <div style="display: flex; gap: 15px;">
+            <input type="text" id="inputBusqueda" placeholder="Buscar por nombre o email..." style="margin-bottom:0; flex-grow: 1;">
+            <button onclick="buscarCliente()" class="btn-gold" style="width: 200px;">Consultar</button>
+        </div>
+        <div id="resultadosBusqueda" style="margin-top: 20px;"></div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; align-items: start;">
+        
+        <div class="card">
+            <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em;">Reglas de Puntos</h3>
+            
+            <form action="/admin/config-puntos" method="POST">
+                <input type="number" name="min" placeholder="Desde $" required>
+                <input type="number" name="max" placeholder="Hasta $" required>
+                <input type="number" name="puntos" placeholder="Puntos" required>
+                <button type="submit" class="btn-gold">Guardar Regla</button>
+            </form>
+
+            <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                {% for regla in reglas %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #222;">
+                    <div style="color: white; font-size: 0.9em;">
+                        <span style="color: var(--text-dim); font-size: 0.8em;">Rango:</span> 
+                        ${{ "{:,.0f}".format(regla.rango_min) if regla.rango_min else 0 }} - ${{ "{:,.0f}".format(regla.rango_max) if regla.rango_max else 0 }}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; font-size: 0.75em; border-radius: 2px; font-weight: bold;">
+                            {{ regla.puntos }} PTS
+                        </span>
+                        <a href="/admin/eliminar-regla/{{ regla.id }}" 
+                           style="color: white; text-decoration: none; font-weight: bold;" 
+                           onclick="return confirm('¿Eliminar esta regla?')">✕</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not reglas %}<p style="color: var(--text-dim); font-size: 0.8em; text-align: center; margin-top: 20px;">No hay reglas definidas.</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--gold); margin-top:0; text-transform: uppercase; font-size: 0.9em;">Catálogo de Premios</h3>
+            
+            <form action="/admin/crear-premio" method="POST">
+                <input type="text" name="nombre" placeholder="Nombre del Premio" required>
+                <input type="number" name="costo" placeholder="Costo en Puntos" required>
+                <button type="submit" class="btn-gold">Publicar Premio</button>
+            </form>
+
+            <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                {% for p in premios %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #222;">
+                    <div style="color: white; font-size: 0.9em;">{{ p.nombre }}</div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: var(--gold); border: 1px solid var(--gold); padding: 2px 8px; font-size: 0.75em; border-radius: 2px;">
+                            {{ p.puntos_requeridos }} PTS
+                        </span>
+                        <a href="/admin/eliminar-premio/{{ p.id }}" 
+                           style="color: white; text-decoration: none; font-weight: bold;"
+                           onclick="return confirm('¿Eliminar premio?')">✕</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not premios %}<p style="color: var(--text-dim); font-size: 0.8em; text-align: center; margin-top: 20px;">No hay premios publicados.</p>{% endif %}
+            </div>
+        </div>
+
+    </div> </div>
+
+<div id="modalEditar" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="editTitle" style="color: var(--gold); margin: 0; text-transform: uppercase;">Editar</h3>
+            <span onclick="closeEditModal()" style="cursor: pointer; font-size: 1.5em;">&times;</span>
+        </div>
+        <form id="editForm" method="POST">
+            <div class="input-group">
+                <label>Nombre</label>
+                <input type="text" id="editNombre" name="nombre" required>
+            </div>
+            <div class="input-group">
+                <label>Precio ($)</label>
+                <input type="number" id="editPrecio" name="precio" required>
+            </div>
+            <div id="extraFields">
+                </div>
+            <button type="submit" class="btn-gold" style="margin-top: 20px;">Actualizar Cambios</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Inyectar premios desde el backend para usarlos en el buscador de clientes
+    const premiosDisponibles = {{ premios | tojson | safe if premios else '[]' }};
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        const target = document.getElementById(id);
+        if (target) {
+            target.classList.add('active');
+            const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(id));
+            if (btn) btn.classList.add('active');
+            window.location.hash = id;
+        }
+    }
+
+    function buscarCliente() {
+        const q = document.getElementById('inputBusqueda').value;
+        const res = document.getElementById('resultadosBusqueda');
+        if (q.length < 3) return alert("Mínimo 3 caracteres");
+        res.innerHTML = "<p style='color:var(--gold); font-size: 0.8em; letter-spacing: 1px;'>CONSULTANDO...</p>";
+        
+        fetch(`/admin/buscar_cliente_json?q=${q}`)
+            .then(r => r.json())
+            .then(data => {
+                res.innerHTML = "";
+                if(data.length === 0) res.innerHTML = "<p style='color:var(--text-dim)'>No se hallaron registros.</p>";
+                data.forEach(c => {
+                    let opciones = premiosDisponibles.map(p =>
+                        `<option value="${p.puntos_requeridos}" ${c.puntos < p.puntos_requeridos ? 'disabled' : ''}>
+                            ${p.nombre} (${p.puntos_requeridos} pts)
+                        </option>`).join('');
+                    res.innerHTML += `
+                        <div class="client-result-item">
+                            <div>
+                                <strong style="color:var(--gold); letter-spacing: 1px;">${c.nombre.toUpperCase()}</strong><br>
+                                <small style="color:var(--text-dim)">${c.email}</small><br>
+                                <span class="badge-gold" style="margin-top:5px; display:inline-block">${c.puntos} PTS</span>
+                            </div>
+                            <form action="/admin/canjear/${c.id}" method="POST" style="display:flex; gap:10px;">
+                                <select name="puntos" required style="margin-bottom:0; width:220px; border-color: var(--gold);">${opciones}</select>
+                                <button type="submit" class="btn-gold" style="width:auto; padding: 0 30px;">Canjear</button>
+                            </form>
+                        </div>`;
+                });
+            });
+    }
+
+    // --- LÓGICA DE EDICIÓN ---
+    function openEditProducto(id, nombre, precio, stock, unidad) {
+        const modal = document.getElementById('modalEditar');
+        const form = document.getElementById('editForm');
+        const extras = document.getElementById('extraFields');
+        
+        document.getElementById('editTitle').innerText = "Editar Producto";
+        document.getElementById('editNombre').value = nombre;
+        document.getElementById('editPrecio').value = precio;
+        
+        form.action = '/admin/editar-producto/' + id;
+        
+        extras.innerHTML = `
+            <div class="input-group"><label>Stock</label><input type="number" name="stock" value="${stock}" required></div>
+            <div class="input-group"><label>Medida</label><input type="text" name="unidad" value="${unidad}" required></div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    function openEditServicio(id, nombre, precio, duracion) {
+        const modal = document.getElementById('modalEditar');
+        const form = document.getElementById('editForm');
+        const extras = document.getElementById('extraFields');
+        
+        document.getElementById('editTitle').innerText = "Editar Servicio";
+        document.getElementById('editNombre').value = nombre;
+        document.getElementById('editPrecio').value = precio;
+        form.action = '/admin/editar-servicio/' + id;
+        extras.innerHTML = `
+            <div class="input-group">
+                <label>Duración (Minutos)</label>
+                <input type="number" name="duracion" value="${duracion}" required>
+            </div>
+        `;
+        modal.style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('modalEditar').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        let modal = document.getElementById('modalEditar');
+        if (event.target == modal) closeEditModal();
+    }
+
+    window.onload = () => {
+        showSection(window.location.hash.replace('#', '') || 'inicio');
+    };
+</script>
+
+</body>
+</html>

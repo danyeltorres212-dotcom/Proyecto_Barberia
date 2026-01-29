@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Agenda - El Barbero 1999</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --danger: #ff4d4d;
+            --success: #2ecc71;
+            --text-muted: #aaa;
+            --blue: #3498db;
+        }
+
+        body {
+    font-family: 'Poppins', sans-serif;
+    /* Creamos una capa oscura (85% de opacidad) sobre la imagen */
+    background: linear-gradient(rgba(10, 10, 10, 0.85), rgba(10, 10, 10, 0.85)), 
+                url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Esto hace que la imagen se quede quieta al hacer scroll */
+    color: white;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+        /* --- NAVEGACIÓN ESTILO SOLICITADO --- */
+        nav {
+            background: black;
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        /* Botón estilo "Únete" para Cerrar Sesión */
+        .btn-logout-gold {
+            background: var(--gold);
+            color: black !important;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem !important;
+        }
+
+        .social-nav {
+            display: flex;
+            gap: 15px;
+            border-left: 1px solid #333;
+            padding-left: 20px;
+        }
+
+        .social-nav i {
+            font-size: 1.2rem;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .social-nav i:hover { color: var(--gold); }
+
+        /* --- SALUDO DE BIENVENIDA --- */
+        .welcome-bar {
+            width: 100%;
+            background: #111;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #222;
+        }
+
+        /* --- CONTENEDORES --- */
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+    background-color: rgba(26, 26, 26, 0.95); /* Un negro casi sólido para que el texto resalte */
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px); /* Esto le da un efecto de vidrio esmerilado muy elegante */
+}
+
+        /* --- TARJETA DE PUNTOS --- */
+        .loyalty-card {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+    border: 1px solid var(--gold);
+    text-align: center; /* <-- Añade esto para centrar los textos superiores */
+}
+
+        .points-total {
+            font-size: 2.5em;
+            color: var(--gold);
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .progress-container {
+            background: #444;
+            border-radius: 10px;
+            height: 10px;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            background: var(--gold);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+            width: var(--p, 0%);
+        }
+
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .reward-item {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            border: 1px solid #333;
+        }
+
+        .reward-item.unlocked { 
+    border-color: var(--gold);
+    opacity: 1;
+}
+        .reward-item.locked { opacity: 0.5; filter: grayscale(1); }
+
+        /* --- FORMULARIO --- */
+        h2 { color: var(--gold); text-align: center; margin-top: 0; font-size: 1.4em; font-family: 'Playfair Display', serif; }
+        label { display: block; margin-top: 15px; color: var(--gold); font-size: 0.9em; font-weight: 600; }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #111;
+            color: white;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(72%) sepia(55%) saturate(464%) hue-rotate(9deg) brightness(92%) contrast(85%);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+        .btn-submit {
+            background: var(--gold);
+            color: black;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            margin-top: 25px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        /* --- TABLA DE CITAS --- */
+        .appointment-list { width: 100%; border-collapse: collapse; }
+        .appointment-list tr.hidden-row { display: none; }
+        .appointment-list td { padding: 15px 0; border-bottom: 1px solid #333; }
+
+        .btn-view-more {
+            background: none;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* --- BANNERS FINALES --- */
+    .dev-promo {
+        width: 100%;
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .promo-container {
+        display: flex;
+        gap: 25px;
+        width: 95%;
+        max-width: 1100px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .promo-card {
+        flex: 1;
+        min-width: 320px;
+        background-color: #0f0f0f; /* Fondo oscuro exacto */
+        padding: 30px;
+        border-radius: 15px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* La tarjeta de la izquierda tiene el borde dorado */
+    .promo-card.contact-border {
+        border-left: 4px solid var(--gold);
+    }
+
+    .promo-card h4 {
+        margin-top: 0;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .promo-card p {
+        color: #ccc;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .promo-info-row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .promo-info-row a {
+        color: var(--gold);
+        font-size: 1.5rem;
+        transition: 0.3s;
+    }
+
+    .promo-info-row a:hover {
+        transform: translateY(-3px);
+    }
+
+    .promo-info-row span {
+        font-size: 0.9rem;
+        color: white;
+    }
+
+    .promo-links a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        transition: 0.3s;
+    }
+
+    .promo-links a i {
+        color: var(--gold);
+        font-size: 1.1rem;
+    }
+
+    .promo-links a:hover {
+        color: var(--gold);
+    }
+
+    .promo-footer-copy {
+        border-top: 1px solid #222;
+        padding-top: 15px;
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .promo-container { flex-direction: column; align-items: center; }
+        .promo-card { width: 100%; }
+    }
+</style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo-img">
+            <span class="logo-text">EL BARBERO 1999</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="/logout" class="btn-logout-gold">SALIR</a>
+            <div class="social-nav">
+                <a href="https://wa.me/573203858222" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://instagram.com/elbarbero1999" target="_blank"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="welcome-bar">
+        <span>Bienvenido, <b style="color: var(--gold);">{{ session['nombre'] }}</b></span>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="padding: 15px; border-radius: 8px; text-align: center; background: {{ '#2ecc7133' if category == 'exito' else '#ff4d4d33' }}; color: {{ '#2ecc71' if category == 'exito' else '#ff4d4d' }}; border: 1px solid {{ '#2ecc71' if category == 'exito' else '#ff4d4d' }};">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+<div class="card loyalty-card">
+    <h3 style="margin:0; color: #888; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px;">Puntos Acumulados</h3>
+    <p class="points-total">{{ usuario.puntos_acumulados }} <span style="font-size: 0.4em; color: white;">pts</span></p>
+
+    {% set proximo_premio = premios | selectattr("puntos_requeridos", "gt", usuario.puntos_acumulados) | sort(attribute='puntos_requeridos') | first %}
+    {% if proximo_premio %}
+        <p style="margin: 10px 0 5px 0; font-size: 0.85em;">Faltan <b>{{ proximo_premio.puntos_requeridos - usuario.puntos_acumulados }}</b> para: <span style="color: var(--gold);">{{ proximo_premio.nombre }}</span></p>
+        <div class="progress-container">
+            {% set porcentaje = (usuario.puntos_acumulados / proximo_premio.puntos_requeridos) * 100 %}
+            <div class="progress-bar" style="--p: {{ [porcentaje, 100]|min }}%;"></div>
+        </div>
+    {% endif %}
+
+    <div class="rewards-grid">
+        {% for premio in premios %}
+        <div class="reward-item {{ 'unlocked' if usuario.puntos_acumulados >= premio.puntos_requeridos else 'locked' }}">
+            <div style="font-size: 1.2rem; margin-bottom: 5px;">
+                {% if usuario.puntos_acumulados >= premio.puntos_requeridos %}
+                    <i class="fas fa-check-circle" style="color: var(--gold);"></i> {% else %}
+                    <i class="fas fa-lock" style="color: #444;"></i> {% endif %}
+            </div>
+            <div style="font-weight: bold; margin: 3px 0; text-transform: capitalize;">{{ premio.nombre }}</div>
+            <div style="color: var(--gold); font-weight: 600;">{{ premio.puntos_requeridos }} pts</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+        <div class="card">
+            <h2>{{ '⚙️ Reprogramar Cita' if edit_turno else 'Agendar Cita' }}</h2>
+            <form action="/agendar" method="POST" id="form-agendar">
+                {% if edit_turno %}
+                    <input type="hidden" name="turno_id" id="edit_turno_id" value="{{edit_turno.id}}">
+                    <input type="hidden" id="horaOriginal" value="{{ edit_turno.fecha_hora.strftime('%H:%M') }}">
+                {% endif %}
+
+                <label><i class="fas fa-user-tie"></i> Barbero</label>
+                <select name="barbero" id="select_barbero" required>
+                    {% for b in barberos %}
+                        <option value="{{b.id}}" {% if edit_turno and edit_turno.empleado_id == b.id %}selected{% endif %}>{{b.nombre}}</option>
+                    {% endfor %}
+                </select>
+
+                <label><i class="fas fa-cut"></i> Servicio</label>
+                <select name="servicio" id="select_servicio" required>
+                    <option value="" disabled {% if not edit_turno %}selected{% endif %}>Seleccione un servicio...</option>
+                    {% for s in servicios %}
+                        <option value="{{s.id}}" data-duracion="{{s.duracion_minutos or 30}}" {% if edit_turno and edit_turno.servicio_id == s.id %}selected{% endif %}>
+                            {{s.nombre}} - ${{s.precio}} ({{s.duracion_minutos or 30}} min)
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label><i class="fas fa-calendar-alt"></i> Fecha</label>
+                <input type="date" name="fecha_dia" id="fecha_dia" required value="{% if edit_turno %}{{edit_turno.fecha_hora.strftime('%Y-%m-%d')}}{% endif %}">
+
+                <label><i class="fas fa-clock"></i> Hora Disponible</label>
+                <select name="hora_slot" id="hora_slot" required>
+                    <option value="">Seleccione barbero, servicio y fecha...</option>
+                </select>
+
+                <button type="submit" class="btn-submit">{{ 'CONFIRMAR CAMBIOS' if edit_turno else 'RESERVAR AHORA' }}</button>
+                {% if edit_turno %}
+                    <a href="/agendar" style="display:block; text-align:center; margin-top:15px; color:var(--text-muted); text-decoration:none; font-size:0.8em;">Cancelar edición</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-list-ul" style="color: var(--gold);"></i> Mis Próximas Citas</h3>
+            <table class="appointment-list" id="tabla-citas">
+                {% for t in turnos if t.estado != 'cancelado' %}
+                <tr class="{{ 'hidden-row' if loop.index > 3 }}">
+                    <td>
+                        <div style="font-weight: bold; color: var(--gold);">{{ t.fecha_hora.strftime('%d/%m/%Y - %H:%M') }}</div>
+                        <div style="font-size: 0.85em;">{{ t.servicio.nombre }} con <b>{{ t.barbero.nombre }}</b></div>
+                    </td>
+                    <td style="text-align: right;">
+                        {% if t.estado == 'pendiente' %}
+                        <a href="/agendar?edit_id={{t.id}}" style="color: white; margin-right: 10px;"><i class="fas fa-edit"></i></a>
+                        <a href="/cancelar-turno/{{t.id}}" 
+                        onclick="return confirm('¿Cancelar cita?')" 
+                        style="color: var(--gold);">
+                     <i class="fas fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">No tienes citas agendadas.</td></tr>
+                {% endfor %}
+            </table>
+            {% if turnos|length > 3 %}
+            <button class="btn-view-more" id="btn-ver-mas" onclick="mostrarTodasCitas()">Ver todas las citas</button>
+            {% endif %}
+        </div>
+
+
+ </div> 
+    </div> <div class="promo-container" style="display: flex; flex-direction: row; justify-content: center; align-items: stretch; gap: 20px; width: 95%; max-width: 1100px; margin: 40px auto; flex-wrap: wrap;">
+        
+        <div class="promo-card contact-border" style="flex: 1; min-width: 320px;">
+            <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+                <div>
+                    <h4 style="color: var(--gold); margin-top: 0;">Contáctanos</h4>
+                    <p style="font-size: 0.9em; color: #ccc;">Resuelve tus dudas o comunícate directamente con nuestro equipo administrativo.</p>
+                    
+                    <div class="promo-info-row" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <a href="https://wa.me/573203858222" target="_blank" style="color: var(--gold); font-size: 1.5rem;"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://instagram.com/elbarbero1999" target="_blank" style="color: var(--gold); font-size: 1.5rem;"><i class="fab fa-instagram"></i></a>
+                        <span style="display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: white;">
+                            <i class="fas fa-envelope" style="color: var(--gold);"></i> barberia@gmail.com
+                        </span>
+                    </div>
+                </div>
+                <div class="promo-footer-copy" style="border-top: 1px solid #333; padding-top: 15px; font-size: 0.75rem; color: #666;">
+                    © 2024 El Barbero 1999 <span style="margin: 0 8px;">|</span> Todos los derechos reservados
+                </div>
+            </div>
+        </div>
+
+        <div class="promo-card" style="flex: 1; min-width: 320px;">
+            <h4 style="color: white; margin-top: 0;">¿Quieres una página como esta?</h4>
+            <p style="font-size: 0.9em; color: #ccc;">Impulsa tu negocio con nuestra tecnología de gestión de turnos y fidelización o desarrollamos una web a  tu medida.</p>
+            <div class="promo-links">
+                <a href="mailto:danyeltorres10@outlook.com" style="display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-size: 0.85em; margin-bottom: 10px;">
+                    <i class="fas fa-envelope" style="color: var(--gold);"></i> danyeltorres10@outlook.com
+                </a>
+                <a href="https://wa.me/573146309295" target="_blank" style="display: flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-size: 0.85em;">
+                    <i class="fab fa-whatsapp" style="color: var(--gold);"></i> +57 314 630 9295
+                </a>
+            </div>
+        </div>
+    </div>
+
+<script>
+const selectBarbero = document.getElementById('select_barbero');
+const selectFecha = document.getElementById('fecha_dia');
+const selectHora = document.getElementById('hora_slot');
+const selectServicio = document.getElementById('select_servicio');
+const editTurnoInput = document.getElementById('edit_turno_id');
+const horaOriginal = document.getElementById('horaOriginal')?.value || null;
+
+selectFecha.setAttribute('min', new Date().toISOString().split('T')[0]);
+
+async function actualizarDisponibilidad() {
+    const barberoId = selectBarbero.value;
+    const fecha = selectFecha.value;
+    const editId = editTurnoInput ? editTurnoInput.value : '';
+    const servicioSeleccionado = selectServicio.selectedOptions[0];
+    
+    if (!servicioSeleccionado || !barberoId || !fecha) return;
+    
+    const duracionSolicitada = parseInt(servicioSeleccionado.getAttribute('data-duracion')) || 30;
+    selectHora.innerHTML = '<option>Calculando...</option>';
+
+    try {
+        const response = await fetch(`/api/disponibilidad?barbero_id=${barberoId}&fecha=${fecha}&edit_id=${editId}`);
+        const bloqueados = await response.json();
+
+        const ahora = new Date();
+        const hoyStr = ahora.toISOString().split('T')[0];
+        const horaActualMinutos = (ahora.getHours() * 60) + ahora.getMinutes();
+
+        selectHora.innerHTML = '';
+        const apertura = 9 * 60;  
+        const cierre = 21 * 60;  
+
+        for (let tiempo = apertura; tiempo + duracionSolicitada <= cierre; tiempo += 5) {
+            if (fecha === hoyStr && tiempo <= horaActualMinutos + 15) continue;
+
+            const h = Math.floor(tiempo / 60);
+            const m = tiempo % 60;
+            const horaInicioStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            
+            const tiempoFin = tiempo + duracionSolicitada;
+            const hF = Math.floor(tiempoFin / 60);
+            const mF = tiempoFin % 60;
+            const horaFinStr = `${hF.toString().padStart(2, '0')}:${mF.toString().padStart(2, '0')}`;
+
+            const estaOcupado = bloqueados.some(slot => {
+                return horaInicioStr < slot.fin && horaFinStr > slot.inicio;
+            });
+
+            if (!estaOcupado) {
+                const opt = document.createElement('option');
+                opt.value = horaInicioStr;
+                opt.textContent = horaInicioStr;
+                if (horaOriginal && horaInicioStr === horaOriginal) opt.selected = true;
+                selectHora.appendChild(opt);
+            }
+        }
+        if (selectHora.options.length === 0) selectHora.innerHTML = '<option value="">Sin turnos disponibles</option>';
+    } catch (error) {
+        selectHora.innerHTML = '<option value="">Error al cargar</option>';
+    }
+}
+
+function mostrarTodasCitas() {
+    document.querySelectorAll('#tabla-citas tr').forEach(tr => tr.classList.remove('hidden-row'));
+    document.getElementById('btn-ver-mas').style.display = 'none';
+}
+
+[selectBarbero, selectFecha, selectServicio].forEach(el => el.addEventListener('change', actualizarDisponibilidad));
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (selectBarbero.value && selectFecha.value && selectServicio.value) {
+        actualizarDisponibilidad();
+    }
+});
+</script>
+</body>
+</html>
