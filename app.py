@@ -53,7 +53,7 @@ def send_async_email(app, msg):
             mail.send(msg)
             print("Correo enviado correctamente")
         except Exception as e:
-            print(f"Error enviando correo async: {e}")
+            print(f"❌ ERROR CRÍTICO EN MAIL: {type(e).__name__}: {str(e)}")
 
 # ... Resto de tus modelos y rutas aquí abajo ...
 
