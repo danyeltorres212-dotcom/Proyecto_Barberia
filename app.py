@@ -5,11 +5,14 @@ from io import BytesIO
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify, current_app
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from threading import Thread
+
+
 
 load_dotenv()
 print("EL CORREO CONFIGURADO ES:", os.getenv('MAIL_USERNAME'))
@@ -20,8 +23,8 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'clave-de-emergencia-por-si-n
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///barberia.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
@@ -32,6 +35,13 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print("Correo enviado correctamente")
+        except Exception as e:
+            print(f"Error enviando correo async: {e}")
 
 # --- MODELOS ---
 
@@ -205,53 +215,55 @@ def registro():
         nombre = request.form.get('nombre')
         email = request.form.get('email').lower()
         password = request.form.get('password')
-        
-        # Validación de seguridad de la contraseña
+
+        # Validación de contraseña
         val = validar_password(password)
         if val is not True:
             flash(f"Seguridad: {val}", "error")
             return redirect(url_for('registro'))
 
+        # Verificar si ya existe el usuario
         if Usuario.query.filter_by(email=email).first():
             flash("El correo ya está registrado.", "error")
             return redirect(url_for('registro'))
-        
-        # Se crea con confirmado=False por defecto
+
+        # Crear nuevo usuario
         nuevo = Usuario(
-            nombre=nombre, 
-            email=email, 
-            password=generate_password_hash(password), 
+            nombre=nombre,
+            email=email,
+            password=generate_password_hash(password),
             rol='cliente',
             confirmado=False
         )
-        db.session.add(nuevo)
-        db.session.commit()
+        
+        try:
+            db.session.add(nuevo)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error en base de datos: {e}")
+            flash("Error interno al crear la cuenta.", "error")
+            return redirect(url_for('registro'))
 
-        # Generar Token de confirmación
+        # Generar token y link de confirmación
         token = serializer.dumps(email, salt='email-confirm')
         link = url_for('confirmar_email', token=token, _external=True)
-        
-        # 1. Creas la variable aquí mismo
-        remitente_seguro = os.getenv('MAIL_USERNAME') 
-        
-        # 2. La usas en el campo 'sender'
+
+        # Preparar el correo
+        remitente_seguro = os.getenv('MAIL_USERNAME')
         msg = Message(
-            'Confirma tu cuenta - Barbero_1999', 
-            sender=remitente_seguro, # <--- USAMOS LA VARIABLE
+            'Confirma tu cuenta - Barbero_1999',
+            sender=remitente_seguro,
             recipients=[email]
         )
         msg.body = f'Hola {nombre}, confirma tu cuenta aquí: {link}'
 
-        try:
-            # Imprimimos en la consola para estar 100% seguros
-            print(f"DEBUG: Enviando correo desde {remitente_seguro}")
-            mail.send(msg)
-            flash("Registro exitoso. ¡Revisa tu correo!", "exito")
-        except Exception as e:
-            print(f"Error enviando correo: {e}")
-            flash("Cuenta creada, pero falló el envío del correo.", "error")
+        app_contexto = current_app._get_current_object()
+        Thread(target=send_async_email, args=(app_contexto, msg)).start()
 
+        flash("Registro exitoso. ¡Revisa tu correo para confirmar!", "exito")
         return redirect(url_for('login'))
+
     return render_template('registro.html')
 
 @app.route('/confirmar_email/<token>')
