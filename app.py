@@ -12,16 +12,28 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from threading import Thread
 
-
-
 load_dotenv()
-print("EL CORREO CONFIGURADO ES:", os.getenv('MAIL_USERNAME'))
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'clave-de-emergencia-por-si-no-carga-el-env')
 
-# Configuración de la base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///barberia.db'
+# --- IMPLEMENTACIÓN DE BASE DE DATOS PROFESIONAL ---
+# Intentamos obtener la URL de PostgreSQL de las variables de entorno de Render
+db_url = os.getenv('DATABASE_URL')
+
+if db_url:
+    # Render entrega postgres://, pero SQLAlchemy requiere postgresql://
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+else:
+    # Si no hay variable (estás en tu PC), usa SQLite local
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///barberia.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# ---------------------------------------------------
+
+# Configuración de Correo
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
@@ -30,11 +42,11 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_DEBUG'] = True
 
-
 db = SQLAlchemy(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
+# Función para envío asíncrono
 def send_async_email(app, msg):
     with app.app_context():
         try:
@@ -42,6 +54,8 @@ def send_async_email(app, msg):
             print("Correo enviado correctamente")
         except Exception as e:
             print(f"Error enviando correo async: {e}")
+
+# ... Resto de tus modelos y rutas aquí abajo ...
 
 # --- MODELOS ---
 
