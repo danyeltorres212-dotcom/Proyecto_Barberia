@@ -248,7 +248,7 @@ def registro():
             email=email,
             password=generate_password_hash(password),
             rol='cliente',
-            confirmado=False
+            confirmado=True
         )
         
         try:
@@ -260,7 +260,8 @@ def registro():
             flash("Error interno al crear la cuenta.", "error")
             return redirect(url_for('registro'))
 
-        # Generar token y link de confirmación
+        # --- SECCIÓN DE CORREO EN HIBERNACIÓN ---
+        """
         token = serializer.dumps(email, salt='email-confirm')
         link = url_for('confirmar_email', token=token, _external=True)
 
@@ -275,6 +276,8 @@ def registro():
 
         app_contexto = current_app._get_current_object()
         Thread(target=send_async_email, args=(app_contexto, msg)).start()
+        """        
+        # --- FIN HIBERNACIÓN ---
 
         flash("Registro exitoso. ¡Revisa tu correo para confirmar!", "exito")
         return redirect(url_for('login'))
@@ -327,25 +330,35 @@ def recuperar_password():
     if request.method == 'POST':
         email = request.form.get('email').lower()
         usuario = Usuario.query.filter_by(email=email).first()
+        
         if usuario:
             token = serializer.dumps(email, salt='pass-reset')
-            link = url_for('reset_password', token=token, _external=True)
             
+            # --- MODO HIBERNACIÓN (CÓDIGO GUARDADO) ---
+            """
             msg = Message(
                 'Recuperar Contraseña - Barbero_1999', 
-                sender=app.config['MAIL_USERNAME'], # <--- CORREGIDO
+                sender=app.config['MAIL_USERNAME'],
                 recipients=[email]
             )
-            msg.body = f'Para restablecer tu contraseña, haz clic en el siguiente enlace: {link}'
-            
+            msg.body = f'Enlace: {url_for("reset_password", token=token, _external=True)}'
             try:
                 mail.send(msg)
             except Exception as e:
-                print(f"Error enviando correo: {e}")
+                print(f"Error omitido: {e}")
+            """
+            # --- FIN HIBERNACIÓN ---
 
-        # Mensaje genérico por seguridad
-        flash("Si el correo existe en nuestro sistema, recibirás instrucciones en breve.", "exito")
+            # Redirigimos directamente al reseteo
+            flash("Usuario verificado. Por favor, define tu nueva contraseña.", "exito")
+            return redirect(url_for('reset_password', token=token))
+        
+        # Si el usuario NO existe, volvemos al login para no dar pistas a intrusos
+        flash("Si el correo existe en nuestro sistema, podrás restablecer tu cuenta.", "exito")
         return redirect(url_for('login'))
+
+    # Este es el return que te estaba fallando. 
+    # Ahora solo se ejecuta si el método es GET (cuando entras a la página).
     return render_template('recuperar.html')
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
