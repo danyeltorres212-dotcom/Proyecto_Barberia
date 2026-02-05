@@ -17,21 +17,24 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'clave-de-emergencia-por-si-no-carga-el-env')
 
-# --- IMPLEMENTACIÓN DE BASE DE DATOS PROFESIONAL ---
-# Intentamos obtener la URL de PostgreSQL de las variables de entorno de Render
+
 db_url = os.getenv('DATABASE_URL')
 
 if db_url:
-    # Render entrega postgres://, pero SQLAlchemy requiere postgresql://
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "pool_pre_ping": True,  
+        "pool_recycle": 300,    
+        "pool_size": 10,        
+        "max_overflow": 20      
+    }
 else:
-    # Si no hay variable (estás en tu PC), usa SQLite local
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///barberia.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# ---------------------------------------------------
+
 
 # Configuración de Correo
 app.config['MAIL_SERVER'] = '74.125.141.108'
@@ -279,7 +282,7 @@ def registro():
         """        
         # --- FIN HIBERNACIÓN ---
 
-        flash("Registro exitoso. ¡Revisa tu correo para confirmar!", "exito")
+        flash("Registro exitoso. Ya puedes iniciar sesión", "exito")
         return redirect(url_for('login'))
 
     return render_template('registro.html')
